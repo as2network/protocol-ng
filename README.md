@@ -1,6 +1,16 @@
 ---
+title: as2network protocol-ng
+description: next generation as2 over evm
+version: 0.4.0:beta
+license: gpl-2.0/sspl-1.0
+---
 
-## Structure
+
+# as2.network - protocol/ng
+
+> next generation as2 protocol 
+
+### Structure
 
 ```
 build/
@@ -16,7 +26,7 @@ For each smart contract there is a little description and a table of yes/no valu
 
 #### _AS2networkUser.sol_
 
-This smart contract is created whenever a new user is created on AS2network's platform. It has two public parameters: the user public key of the wallet generated outside and the public key of the deployer of the smart contract.
+This smart contract is created whenever a new user is created on AS2 Network's platform. It has two public parameters: the user public key of the wallet generated outside and the public key of the deployer of the smart contract.
 
 The remaining methods are just setters/getters/deleters of attributes among 4 different types of data (string/number/address/bool) both as singleton or arrays.
 
@@ -51,10 +61,12 @@ This smart contract is an aggregator of all the users. It keeps track of roles/r
 
 #### _AttributeManager.sol_
 
+<!-- FIXME -->
 This is a work in progress...
 
 #### _SignatureAggregator.sol_
 
+<!-- FIXME -->
 This keeps track of all the signatures request that an User create and offer getters to obtain their smart contract address.
 One of this is deployed for each user.
 
@@ -104,6 +116,7 @@ This smart contract is an aggregator of all the certified files uploaded to the 
 
 #### _SignatureDeployer.sol_
 
+<!-- FIXME -->
 This smart contract serves as deployer of other smart contracts on blockchain. The purpose is to reduce as much as possible the gas consumption so instead of importing nested contracts in our definitions we developed this smart contract living beforehand on blockchain and serving new incoming smart contracts.
 
 In concrete this is able to deploy the smart contracts related to:
@@ -170,6 +183,7 @@ Here the owner of the signature can trigger three actions:
 - Cancel the document
 - Decline the document
 
+<!-- FIXME -->
 All the other actions are restricted to be executed exclusively by the AS2network account.
 
 | Parameter      | Type      | Hashed ? |
@@ -193,7 +207,10 @@ All the other actions are restricted to be executed exclusively by the AS2networ
 
 #### _CertifiedEmail.sol_
 
+<!-- FIXME -->
 As the _AS2network.sol_ smart contract, this is one of the most important smart contracts. It represents a certified email request on AS2network platform and brings all the parameters and actions needed to deal with, to set and to retrieve all the related entities (_Certificate_, _Event_ and _File_). It also makes use of the _CertifiedEmailDeployer.sol_ to instantiate all the needed contracts.
+
+the term *certified mail* refers to the non-repudiation quality of AS2 messaging
 
 To save gas consumptions it imports just the interfaces of the other contracts and it makes use of a library to convert some datatypes to others.
 

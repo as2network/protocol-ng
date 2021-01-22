@@ -3,7 +3,6 @@ pragma solidity <0.6.0;
 import "./DocumentInterface.sol";
 import "./AS2networkUserInterface.sol";
 
-
 contract SignatureInterface {
     address public as2network;
     address public deployer;
@@ -13,7 +12,7 @@ contract SignatureInterface {
 
     string[] public documentsId;
 
-    int public createdAt;
+    int256 public createdAt;
 
     mapping(string => DocumentInterface) private documents;
 
@@ -21,117 +20,58 @@ contract SignatureInterface {
 
     AS2networkUserInterface public userContract;
 
-    function notify(
-        string memory attribute,
-        address adr
-    )
-        public;
-    
-    function notifyCreation()
-        public;
+    function notify(string memory attribute, address adr) public;
+
+    function notifyCreation() public;
 
     function createDocument(
         string memory documentId,
         string memory signatureType,
-        uint documentCreatedAt
-    )
-        public;
+        uint256 documentCreatedAt
+    ) public;
 
-    function setDocumentOwner(
-        string memory documentId,
-        address documentOwner
-    )
-        public;
+    function setDocumentOwner(string memory documentId, address documentOwner) public;
 
-    function setSignedFileHash(
-        string memory documentId,
-        string memory signedFileHash
-    )
-        public;
+    function setSignedFileHash(string memory documentId, string memory signedFileHash) public;
 
-    function cancelDocument(
-        string memory documentId,
-        string memory cancelReason
-    )
-        public;
+    function cancelDocument(string memory documentId, string memory cancelReason) public;
 
     function createFile(
         string memory documentId,
         string memory fileId,
         string memory fileName,
         string memory fileHash,
-        uint fileCreatedAt,
-        uint fileSize
-    )
-        public;
+        uint256 fileCreatedAt,
+        uint256 fileSize
+    ) public;
 
     function createEvent(
         string memory documentId,
         string memory eventId,
         string memory eventType,
         string memory eventUserAgent,
-        uint eventCreatedAt
-    )
-        public;
+        uint256 eventCreatedAt
+    ) public;
 
-    function getClause(
-        string memory clauseType
-    )
-        public
-        view
-        returns (address clauseAddress);
+    function getClause(string memory clauseType) public view returns (address clauseAddress);
 
-    function getFile(
-        string memory documentId
-    )
-        public
-        view
-        returns (address);
+    function getFile(string memory documentId) public view returns (address);
 
-    function getDocument(
-        string memory documentId
-    )
-        public
-        view
-        returns (address);
+    function getDocument(string memory documentId) public view returns (address);
 
-    function getDocumentByIndex(
-        uint index
-    )
-        public
-        view
-        returns (address);
+    function getDocumentByIndex(uint256 index) public view returns (address);
 
-    function getDocumentsSize()
-        public
-        view
-        returns (uint);
+    function getDocumentsSize() public view returns (uint256);
 
-    function getEvent(
-        string memory documentId,
-        string memory eventId
-    )
-        public
-        view
-        returns (address);
+    function getEvent(string memory documentId, string memory eventId) public view returns (address);
 
-    function _notifyEntityEvent (
+    function _notifyEntityEvent(
         string memory notifiersKey,
         string memory createdEvent,
         address adrToNotify
-    )
-        private;
+    ) private;
 
-    function _getDocument(
-        string memory documentId
-    )
-        private
-        returns (DocumentInterface);
+    function _getDocument(string memory documentId) private returns (DocumentInterface);
 
-    function _documentExist(
-        string memory documentId
-    )
-        private
-        view
-        returns (bool);
+    function _documentExist(string memory documentId) private view returns (bool);
 }

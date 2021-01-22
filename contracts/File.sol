@@ -6,7 +6,6 @@ Gas to deploy: 570.352
 
 import "./interfaces/FileInterface.sol";
 
-
 contract File is FileInterface {
     address public parent;
 
@@ -14,23 +13,16 @@ contract File is FileInterface {
     string public name;
     string public originalFileHash;
 
-    uint public createdAt;
-    uint public size;
+    uint256 public createdAt;
+    uint256 public size;
 
-    constructor(
-        string memory fileId
-    )
-        public
-    {
+    constructor(string memory fileId) public {
         id = fileId;
         parent = msg.sender;
     }
 
     modifier parentOnly() {
-        require(
-            msg.sender == parent,
-            "Only the parent account can perform this action"
-        );
+        require(msg.sender == parent, "Only the parent account can perform this action");
 
         _;
     }
@@ -38,17 +30,10 @@ contract File is FileInterface {
     function init(
         string memory fileName,
         string memory fileHash,
-        uint fileDate,
-        uint fileSize
-    )
-        public
-        parentOnly
-    {
-        require(
-            fileSize > 0 &&
-            bytes(fileName).length != 0,
-            "Invalid input value(s)"
-        );
+        uint256 fileDate,
+        uint256 fileSize
+    ) public parentOnly {
+        require(fileSize > 0 && bytes(fileName).length != 0, "Invalid input value(s)");
 
         name = fileName;
         size = fileSize;

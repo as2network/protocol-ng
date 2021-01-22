@@ -8,27 +8,14 @@ import "./File.sol";
 import "./Document.sol";
 import "./Event.sol";
 
-
 contract SignatureDeployer {
-
     constructor() public {}
 
-    function deployFile(
-        string memory fileId
-    )
-        public
-        returns (address)
-    {
+    function deployFile(string memory fileId) public returns (address) {
         return address(new File(fileId));
     }
 
-    function deployDocument(
-        string memory documentId,
-        address deployer
-    )
-        public
-        returns (address)
-    {
+    function deployDocument(string memory documentId, address deployer) public returns (address) {
         return address(new Document(documentId, deployer));
     }
 
@@ -36,18 +23,8 @@ contract SignatureDeployer {
         string memory eventId,
         string memory eventType,
         string memory eventUserAgent,
-        uint eventCreatedAt
-    )
-        public
-        returns (address)
-    {
-        return address(
-            new Event(
-                eventId,
-                eventType,
-                eventUserAgent,
-                eventCreatedAt
-            )
-        );
+        uint256 eventCreatedAt
+    ) public returns (address) {
+        return address(new Event(eventId, eventType, eventUserAgent, eventCreatedAt));
     }
 }

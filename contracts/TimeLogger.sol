@@ -6,31 +6,27 @@ Gas to deploy: 2.623.165
 
 import "./Clause.sol";
 
+contract TimeLogger is Clause("timelogger-clause-notifiers") {
+    uint256 public constant SECONDS_PER_DAY = 86400;
 
-contract TimeLogger is Clause(
-    "timelogger-clause-notifiers"
-)
-{
-    uint constant public SECONDS_PER_DAY = 86400;
+    string public constant SOLIDITY_SOURCE = "solidity";
+    string public constant EXTERNAL_SOURCE = "external";
 
-    string constant public SOLIDITY_SOURCE = "solidity";
-    string constant public EXTERNAL_SOURCE = "external";
+    string public constant CLAUSE_EVENT_TYPE = "timelog.added";
+    string public constant CREATION_EVENT_TYPE = "timelogger_clause.created";
 
-    string constant public CLAUSE_EVENT_TYPE = "timelog.added";
-    string constant public CREATION_EVENT_TYPE = "timelogger_clause.created";
-
-    string constant public VALIDATED_NOTIFIERS_KEY = "validated-notifiers";
+    string public constant VALIDATED_NOTIFIERS_KEY = "validated-notifiers";
 
     struct TimeLog {
-        uint timeStart;
-        uint timeEnd;
+        uint256 timeStart;
+        uint256 timeEnd;
         string source;
         bool valid;
     }
 
     struct Day {
-        uint[] timelogs;
-        uint total;
+        uint256[] timelogs;
+        uint256 total;
         bool existence;
     }
 
@@ -38,30 +34,28 @@ contract TimeLogger is Clause(
 
     bool public expired;
 
-    uint public endDate;
-    uint public startDate;
-    uint public weeklyHours;
-    uint public lastOpenDay = 0;
+    uint256 public endDate;
+    uint256 public startDate;
+    uint256 public weeklyHours;
+    uint256 public lastOpenDay = 0;
 
-    int public duration;
+    int256 public duration;
 
     TimeLog[] public timeLog;
 
-    mapping(uint => Day) private day;
+    mapping(uint256 => Day) private day;
 
-    constructor (
+    constructor(
         address managerContractAddress,
         address ownerContractAddress,
         address signatureContractAddress,
         string memory id,
         string memory document,
-        uint start,
-        uint end,
-        uint weekHours,
-        int contractDuration
-    )
-        public
-    {
+        uint256 start,
+        uint256 end,
+        uint256 weekHours,
+        int256 contractDuration
+    ) public {
         contractId = id;
         documentId = document;
 
@@ -83,66 +77,41 @@ contract TimeLogger is Clause(
     }
 
     modifier onlyManager() {
-        require(
-            msg.sender == address(userContract.ownerAddress()),
-            "Only the manager account can perform this action"
-        );
+        require(msg.sender == address(userContract.ownerAddress()), "Only the manager account can perform this action");
 
         _;
     }
 
     modifier onlyOwner() {
-        require(
-            msg.sender == address(ownerContract.ownerAddress()),
-            "Only the owner account can perform this action"
-        );
+        require(msg.sender == address(ownerContract.ownerAddress()), "Only the owner account can perform this action");
 
         _;
     }
 
     modifier notExpired() {
-        require(
-            expired == false,
-            "This contract has expired"
-        );
+        require(expired == false, "This contract has expired");
 
         _;
     }
 
     //Externals
-    function externalSourceLog(
-        uint time
-    )
-        external
-        onlyManager
-        notExpired
-    {
+    function externalSourceLog(uint256 time) external onlyManager notExpired {
         _logTime(time, EXTERNAL_SOURCE);
     }
 
-    function soliditySourceLog()
-        external
-        onlyOwner
-        notExpired
-    {
+    function soliditySourceLog() external onlyOwner notExpired {
         _logTime(block.timestamp, SOLIDITY_SOURCE);
     }
 
-    function expireContract()
-        external
-        onlyManager
-    {
+    function expireContract() external onlyManager {
         expired = true;
     }
 
     function createTimeLog(
-        uint thisDay,
-        uint start,
-        uint end
-    )
-        external
-        onlyManager
-    {
+        uint256 thisDay,
+        uint256 start,
+        uint256 end
+    ) external onlyManager {
         _setDay(thisDay);
 
         _createLog(thisDay, start, EXTERNAL_SOURCE);
@@ -151,18 +120,15 @@ contract TimeLogger is Clause(
     }
 
     function editTimeLog(
-        uint thisDay,
-        uint logIndex,
-        uint start,
-        uint end,
+        uint256 thisDay,
+        uint256 logIndex,
+        uint256 start,
+        uint256 end,
         bool validity
-    )
-        external
-        onlyManager
-    {
+    ) external onlyManager {
         require(end >= start, "Invalid time frame");
 
-        uint index = day[thisDay].timelogs[logIndex];
+        uint256 index = day[thisDay].timelogs[logIndex];
 
         timeLog[index].timeStart = start;
         timeLog[index].timeEnd = end;
@@ -174,55 +140,36 @@ contract TimeLogger is Clause(
 
     //Getters
 
-    function getDayTime(
-        uint thisDay
-    )
-        external
-        view
-        returns(uint total)
-    {
+    function getDayTime(uint256 thisDay) external view returns (uint256 total) {
         if (!day[thisDay].existence) return 0;
 
         return day[thisDay].total;
     }
 
-    function getTotalLoggedTime(
-        uint startDay,
-        uint endDay
-    )
-        external
-        view
-        returns(uint total)
-    {
+    function getTotalLoggedTime(uint256 startDay, uint256 endDay) external view returns (uint256 total) {
         if (startDay > endDay) return 0;
 
-        uint totalAmount = 0;
+        uint256 totalAmount = 0;
 
-        for (uint i = startDay; i <= endDay; i++) {
+        for (uint256 i = startDay; i <= endDay; i++) {
             if (day[i].existence) totalAmount += day[i].total;
         }
 
         return totalAmount;
     }
 
-    function getTimeLog(
-        uint thisDay,
-        uint index
-    )
+    function getTimeLog(uint256 thisDay, uint256 index)
         external
         view
-        returns(
-            uint start,
-            uint end,
+        returns (
+            uint256 start,
+            uint256 end,
             string memory source,
             bool valid,
             bool more
         )
     {
-        if (
-            !day[thisDay].existence ||
-            day[thisDay].timelogs.length <= index
-        ) {
+        if (!day[thisDay].existence || day[thisDay].timelogs.length <= index) {
             return (0, 0, "", false, false);
         }
 
@@ -241,13 +188,8 @@ contract TimeLogger is Clause(
 
     //Internals
 
-    function _logTime(
-        uint time,
-        string memory source
-    )
-        internal
-    {
-        uint today = time / SECONDS_PER_DAY;
+    function _logTime(uint256 time, string memory source) internal {
+        uint256 today = time / SECONDS_PER_DAY;
 
         _setDay(today);
 
@@ -271,33 +213,26 @@ contract TimeLogger is Clause(
     }
 
     function _createLog(
-        uint thisDay,
-        uint startTime,
+        uint256 thisDay,
+        uint256 startTime,
         string memory source
-    )
-        internal
-    {
+    ) internal {
         timeLog.push(TimeLog(startTime, 0, source, true));
 
         day[thisDay].timelogs.push(timeLog.length - 1);
     }
 
     function _closeLog(
-        uint thisDay,
-        uint endTime,
+        uint256 thisDay,
+        uint256 endTime,
         string memory source
-    )
-        internal
-    {
-        uint index = day[thisDay].timelogs[day[thisDay].timelogs.length - 1];
+    ) internal {
+        uint256 index = day[thisDay].timelogs[day[thisDay].timelogs.length - 1];
 
         require(endTime >= timeLog[index].timeStart, "Invalid time frame");
 
         //Assumption: if source coming from input doesnt equal the one saved, prefer the last one
-        if (
-            keccak256(abi.encodePacked((timeLog[index].source))) != keccak256(abi.encodePacked((source)))
-        )
-
+        if (keccak256(abi.encodePacked((timeLog[index].source))) != keccak256(abi.encodePacked((source))))
             timeLog[index].source = source;
 
         timeLog[index].timeEnd = endTime;
@@ -306,37 +241,30 @@ contract TimeLogger is Clause(
     }
 
     function _completePendingDays(
-        uint today,
-        uint nowInSeconds,
+        uint256 today,
+        uint256 nowInSeconds,
         string memory source
-    )
-        internal
-    {
-        uint lastMidnight = (lastOpenDay*SECONDS_PER_DAY)+SECONDS_PER_DAY;
+    ) internal {
+        uint256 lastMidnight = (lastOpenDay * SECONDS_PER_DAY) + SECONDS_PER_DAY;
 
         _closeLog(lastOpenDay, lastMidnight, source);
 
         _completeDaysInTheGap(today, lastOpenDay);
 
-        uint todayMidnight = today*SECONDS_PER_DAY;
+        uint256 todayMidnight = today * SECONDS_PER_DAY;
 
         _createLog(today, todayMidnight, source);
 
         _closeLog(today, nowInSeconds, source);
     }
 
-    function _completeDaysInTheGap(
-        uint today,
-        uint lastDay
-    )
-        internal
-    {
+    function _completeDaysInTheGap(uint256 today, uint256 lastDay) internal {
         //fulfill the days in the gap with 24h single log
-        for (uint i = lastDay + 1; i < today; i++) {
+        for (uint256 i = lastDay + 1; i < today; i++) {
             _setDay(i);
 
-            uint startOfTheDay = i*SECONDS_PER_DAY;
-            uint endOfTheDay = startOfTheDay + SECONDS_PER_DAY;
+            uint256 startOfTheDay = i * SECONDS_PER_DAY;
+            uint256 endOfTheDay = startOfTheDay + SECONDS_PER_DAY;
 
             _createLog(i, startOfTheDay, SOLIDITY_SOURCE);
 
@@ -344,29 +272,19 @@ contract TimeLogger is Clause(
         }
     }
 
-    function _recalculateTotal(
-        uint thisDay
-    )
-        internal
-    {
-        uint totalAmount;
+    function _recalculateTotal(uint256 thisDay) internal {
+        uint256 totalAmount;
 
-        for (uint i = 0; i < day[thisDay].timelogs.length; i++) {
-            totalAmount += (
-                    timeLog[day[thisDay].timelogs[i]].timeEnd - timeLog[day[thisDay].timelogs[i]].timeStart
-            );
+        for (uint256 i = 0; i < day[thisDay].timelogs.length; i++) {
+            totalAmount += (timeLog[day[thisDay].timelogs[i]].timeEnd - timeLog[day[thisDay].timelogs[i]].timeStart);
         }
 
         day[thisDay].total = totalAmount;
     }
 
-    function _setDay(
-        uint today
-    )
-        internal
-    {
+    function _setDay(uint256 today) internal {
         if (day[today].timelogs.length == 0) {
-            uint[] memory tmpArray;
+            uint256[] memory tmpArray;
 
             day[today] = Day(tmpArray, 0, true);
         }

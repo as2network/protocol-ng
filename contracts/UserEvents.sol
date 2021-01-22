@@ -14,29 +14,29 @@ contract UserEvents is NotifierInterface {
 
     AS2networkUserInterface public userContract;
 
-    string constant private USER_EVENTS = "user_events";
+    string private constant USER_EVENTS = "user_events";
 
-    string constant private FILE_CREATED_EVENT = "file.contract.created";
-    string constant private EVENT_CREATED_EVENT = "event.contract.created";
-    string constant private TIMELOG_ADDED_EVENT = "timelog.added";
-    string constant private DOCUMENT_CREATED_EVENT = "document.contract.created";
-    string constant private SIGNATURE_CREATED_EVENT = "signature.contract.created";
-    string constant private PAYMENT_CHECK_ADDED_EVENT = "payment_check.added";
-    string constant private CERTIFICATE_CREATED_EVENT = "certificate.contract.created";
-    string constant private CERTIFIED_FILE_CREATED_EVENT = "certified_file.contract.created";
-    string constant private CERTIFIED_EMAIL_CREATED_EVENT = "certified_email.contract.created";
+    string private constant FILE_CREATED_EVENT = "file.contract.created";
+    string private constant EVENT_CREATED_EVENT = "event.contract.created";
+    string private constant TIMELOG_ADDED_EVENT = "timelog.added";
+    string private constant DOCUMENT_CREATED_EVENT = "document.contract.created";
+    string private constant SIGNATURE_CREATED_EVENT = "signature.contract.created";
+    string private constant PAYMENT_CHECK_ADDED_EVENT = "payment_check.added";
+    string private constant CERTIFICATE_CREATED_EVENT = "certificate.contract.created";
+    string private constant CERTIFIED_FILE_CREATED_EVENT = "certified_file.contract.created";
+    string private constant CERTIFIED_EMAIL_CREATED_EVENT = "certified_email.contract.created";
 
-    string constant private FILE_NOTIFIERS_KEY = "file-notifiers";
-    string constant private EVENT_NOTIFIERS_KEY = "event-notifiers";
-    string constant private DOCUMENT_NOTIFIERS_KEY = "document-notifiers";
-    string constant private SIGNATURE_NOTIFIERS_KEY = "signature-notifiers";
-    string constant private TIMELOGGER_NOTIFIERS_KEY = "timelogger-clause-notifiers";
-    string constant private CERTIFICATE_NOTIFIERS_KEY = "certificate-notifiers";
-    string constant private PAYMENT_CHECKS_NOTIFIERS_KEY = "payment-clause-notifiers";
-    string constant private CERTIFIED_FILE_NOTIFIERS_KEY = "certified-file-notifiers";
-    string constant private CERTIFIED_EMAIL_NOTIFIERS_KEY = "certified-email-notifiers";
+    string private constant FILE_NOTIFIERS_KEY = "file-notifiers";
+    string private constant EVENT_NOTIFIERS_KEY = "event-notifiers";
+    string private constant DOCUMENT_NOTIFIERS_KEY = "document-notifiers";
+    string private constant SIGNATURE_NOTIFIERS_KEY = "signature-notifiers";
+    string private constant TIMELOGGER_NOTIFIERS_KEY = "timelogger-clause-notifiers";
+    string private constant CERTIFICATE_NOTIFIERS_KEY = "certificate-notifiers";
+    string private constant PAYMENT_CHECKS_NOTIFIERS_KEY = "payment-clause-notifiers";
+    string private constant CERTIFIED_FILE_NOTIFIERS_KEY = "certified-file-notifiers";
+    string private constant CERTIFIED_EMAIL_NOTIFIERS_KEY = "certified-email-notifiers";
 
-    string constant private VALIDATED_NOTIFIERS_KEY = "validated-notifiers";
+    string private constant VALIDATED_NOTIFIERS_KEY = "validated-notifiers";
 
     event SignatureCreated(address);
     event DocumentCreated(address);
@@ -48,11 +48,7 @@ contract UserEvents is NotifierInterface {
     event TimeLogAdded(address);
     event PaymentCheckAdded(address);
 
-    constructor (
-        address as2networkUser
-    )
-        public
-    {
+    constructor(address as2networkUser) public {
         as2network = msg.sender;
 
         userContract = AS2networkUserInterface(as2networkUser);
@@ -70,18 +66,10 @@ contract UserEvents is NotifierInterface {
         userContract.setAddressArrayAttribute(CERTIFIED_EMAIL_NOTIFIERS_KEY, address(this));
     }
 
-    function notify (
-        string memory eventType,
-        address addr
-    )
-        public
-    {
+    function notify(string memory eventType, address addr) public {
         bytes32 bytes32event = Utils.keccak(eventType);
 
-        require(
-            validAddress(),
-            "Only AS2network or a validated account can perform this action"
-        );
+        require(validAddress(), "Only AS2network or a validated account can perform this action");
 
         if (bytes32event == Utils.keccak(SIGNATURE_CREATED_EVENT)) {
             emit SignatureCreated(addr);
@@ -104,14 +92,13 @@ contract UserEvents is NotifierInterface {
         }
     }
 
-    function validAddress() internal view returns(bool){
+    function validAddress() internal view returns (bool) {
         address checkedAddress;
-        uint notificationIndex = 0;
+        uint256 notificationIndex = 0;
         bool result = false;
 
         if (tx.origin == as2network) {
             result = true;
-
         } else {
             do {
                 checkedAddress = userContract.getAddressArrayAttribute(VALIDATED_NOTIFIERS_KEY, notificationIndex);

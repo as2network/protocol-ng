@@ -2,7 +2,6 @@ pragma solidity <0.6.0;
 
 import "./interfaces/AS2networkUserInterface.sol";
 
-
 contract BaseAggregator {
     AS2networkUserInterface public userContract;
 
@@ -11,11 +10,8 @@ contract BaseAggregator {
     string public aggregatorName;
     string public notifiersKey;
 
-    modifier as2networkOnly () {
-        require(
-            tx.origin == as2network,
-            "Only AS2network account can perform this action"
-        );
+    modifier as2networkOnly() {
+        require(tx.origin == as2network, "Only AS2network account can perform this action");
 
         _;
     }
@@ -32,14 +28,8 @@ contract BaseAggregator {
 
         userContract = AS2networkUserInterface(userContractAddress);
 
-        userContract.setAddressAttribute(
-            aggregatorName,
-            address(this)
-        );
+        userContract.setAddressAttribute(aggregatorName, address(this));
 
-        userContract.setAddressArrayAttribute(
-            notifiersKey,
-            address(this)
-        );
+        userContract.setAddressArrayAttribute(notifiersKey, address(this));
     }
 }

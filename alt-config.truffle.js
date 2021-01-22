@@ -26,49 +26,49 @@ const packageJSON = fs.readFileSync("package.json").toString();
 const solcVersion = packageJSON.split('"solc": "')[1].split('"')[0].toString();
 
 module.exports = {
-	/**
-	 * Networks define how you connect to your ethereum client and let you set the
-	 * defaults web3 uses to send transactions. If you don't specify one truffle
-	 * will spin up a development blockchain for you on port 9545 when you
-	 * run `develop` or `test`. You can ask a truffle command to use a specific
-	 * network from the command line, e.g
-	 *
-	 * $ truffle test --network <network-name>
-	 */
+  /**
+   * Networks define how you connect to your ethereum client and let you set the
+   * defaults web3 uses to send transactions. If you don't specify one truffle
+   * will spin up a development blockchain for you on port 9545 when you
+   * run `develop` or `test`. You can ask a truffle command to use a specific
+   * network from the command line, e.g
+   *
+   * $ truffle test --network <network-name>
+   */
 
-	networks: {
-		// development: {
-		//     host: 'localhost',
-		//     port: 8545,
-		//     network_id: '*',
-		//     gas: 6721975
-		// },
-		// local network for generating coverage
-		coverage: {
-			host: "localhost",
-			network_id: "*",
-			port: 8555, // <-- If you change this, also set the port option in .solcover.js.
-			gas: 0xfffffffffff, // <-- Use this high gas value
-			gasPrice: 0x01, // <-- Use this low gas price
-		},
-	},
+  networks: {
+    // development: {
+    //     host: 'localhost',
+    //     port: 8545,
+    //     network_id: '*',
+    //     gas: 6721975
+    // },
+    // local network for generating coverage
+    coverage: {
+      host: "localhost",
+      network_id: "*",
+      port: 8555, // <-- If you change this, also set the port option in .solcover.js.
+      gas: 0xfffffffffff, // <-- Use this high gas value
+      gasPrice: 0x01, // <-- Use this low gas price
+    },
+  },
 
-	// Set default mocha options here, use special reporters etc.
-	mocha: {
-		// timeout: 100000
-	},
+  // Set default mocha options here, use special reporters etc.
+  mocha: {
+    // timeout: 100000
+  },
 
-	// Configure your compilers
-	compilers: {
-		solc: {
-			version: solcVersion,
-		},
-	},
+  // Configure your compilers
+  compilers: {
+    solc: {
+      version: solcVersion,
+    },
+  },
 
-	solc: {
-		optimizer: {
-			enabled: true,
-			runs: 10,
-		},
-	},
+  solc: {
+    optimizer: {
+      enabled: true,
+      runs: 10,
+    },
+  },
 };

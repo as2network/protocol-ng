@@ -1,6 +1,5 @@
 pragma solidity <0.6.0;
 
-
 contract FileInterface {
     address public parent;
 
@@ -8,14 +7,13 @@ contract FileInterface {
     string public name;
     string public originalFileHash;
 
-    uint public createdAt;
-    uint public size;
+    uint256 public createdAt;
+    uint256 public size;
 
     function init(
         string memory fileName,
         string memory fileHash,
-        uint fileDate,
-        uint fileSize
-    )
-        public;
+        uint256 fileDate,
+        uint256 fileSize
+    ) public;
 }

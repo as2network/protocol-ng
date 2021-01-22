@@ -10,8 +10,8 @@ contract CertifiedFileInterface {
     string public id;
     string public hash;
 
-    uint public createdAt;
-    uint public size;
+    uint256 public createdAt;
+    uint256 public size;
 
     AS2networkUserInterface userContract;
 }

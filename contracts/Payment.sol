@@ -14,25 +14,21 @@ PARTIALLY_PAID = 4;
 
 import "./Clause.sol";
 
-
-contract Payment is Clause(
-    "payment-clause-notifiers"
-)
-{
-    string constant public CLAUSE_EVENT_TYPE = "payment_check.added";
-    string constant public CREATION_EVENT_TYPE = "payment_clause.created";
+contract Payment is Clause("payment-clause-notifiers") {
+    string public constant CLAUSE_EVENT_TYPE = "payment_check.added";
+    string public constant CREATION_EVENT_TYPE = "payment_clause.created";
 
     struct PaymentCheck {
         string id;
-        uint status;
-        uint checkedAt;
-        uint createdAt;
+        uint256 status;
+        uint256 checkedAt;
+        uint256 createdAt;
     }
 
     struct Reference {
         string id;
         string value;
-        uint price;
+        uint256 price;
         string[] checks;
     }
 
@@ -49,9 +45,9 @@ contract Payment is Clause(
 
     string[] public receiversArray;
 
-    uint public startDate;
-    uint public endDate;
-    uint public period;
+    uint256 public startDate;
+    uint256 public endDate;
+    uint256 public period;
 
     mapping(string => Receiver) private receivers;
     mapping(string => Reference) private references;
@@ -61,9 +57,7 @@ contract Payment is Clause(
         address userContractAddress,
         address signatureContractAddress,
         string memory id
-    )
-        public
-    {
+    ) public {
         contractId = id;
         as2network = msg.sender;
 
@@ -72,10 +66,7 @@ contract Payment is Clause(
     }
 
     modifier as2networkOnly() {
-        require(
-            msg.sender == as2network,
-            "Only AS2network account can perform this action"
-        );
+        require(msg.sender == as2network, "Only AS2network account can perform this action");
 
         _;
     }
@@ -83,13 +74,10 @@ contract Payment is Clause(
     function init(
         string memory signature,
         string memory document,
-        uint start,
-        uint end,
-        uint paymentPeriod
-    )
-        public
-        as2networkOnly
-    {
+        uint256 start,
+        uint256 end,
+        uint256 paymentPeriod
+    ) public as2networkOnly {
         endDate = end;
         startDate = start;
         documentId = document;
@@ -99,12 +87,7 @@ contract Payment is Clause(
         _notifySignature(CREATION_EVENT_TYPE);
     }
 
-    function setReceiver(
-        string memory id
-    )
-        public
-        as2networkOnly
-    {
+    function setReceiver(string memory id) public as2networkOnly {
         _getReceiver(id);
     }
 
@@ -112,15 +95,9 @@ contract Payment is Clause(
         string memory receiverId,
         string memory referenceId,
         string memory referenceValue,
-        uint referencePrice
-    )
-        public
-        as2networkOnly
-    {
-        Reference storage newReference = _getReference(
-            receiverId,
-            referenceId
-        );
+        uint256 referencePrice
+    ) public as2networkOnly {
+        Reference storage newReference = _getReference(receiverId, referenceId);
 
         newReference.id = referenceId;
         newReference.value = referenceValue;
@@ -131,49 +108,32 @@ contract Payment is Clause(
         string memory receiverId,
         string memory referenceId,
         string memory paymentCheckId,
-        uint status,
-        uint checkedAt,
-        uint createdAt
-    )
-        public
-        as2networkOnly
-    {
-        Reference storage newReference = _getReference(
-            receiverId,
-            referenceId
-        );
+        uint256 status,
+        uint256 checkedAt,
+        uint256 createdAt
+    ) public as2networkOnly {
+        Reference storage newReference = _getReference(receiverId, referenceId);
 
-        paymentChecks[paymentCheckId] = PaymentCheck(
-            paymentCheckId,
-            status,
-            checkedAt,
-            createdAt
-        );
+        paymentChecks[paymentCheckId] = PaymentCheck(paymentCheckId, status, checkedAt, createdAt);
 
         newReference.checks.push(paymentCheckId);
 
         _notify(CLAUSE_EVENT_TYPE);
     }
 
-    function getReceiversSize()
-        public
-        view
-        returns(uint)
-    {
+    function getReceiversSize() public view returns (uint256) {
         return receiversArray.length;
     }
 
     // Get paymentCheck if you got the id
-    function getPaymentCheckById(
-        string memory paymentCheckId
-    )
+    function getPaymentCheckById(string memory paymentCheckId)
         public
         view
         returns (
             string memory id,
-            uint status,
-            uint checkedAt,
-            uint createdAt
+            uint256 status,
+            uint256 checkedAt,
+            uint256 createdAt
         )
     {
         _checkPaymentCheckExistence(paymentCheckId);
@@ -187,207 +147,123 @@ contract Payment is Clause(
     }
 
     // Get paymentCheckID if you want the last one given a referenceId
-    function getLastPaymentCheckFromReference(
-        string memory referenceId
-    )
+    function getLastPaymentCheckFromReference(string memory referenceId)
         public
         view
         returns (
             string memory id,
-            uint status,
-            uint checkedAt,
-            uint createdAt
+            uint256 status,
+            uint256 checkedAt,
+            uint256 createdAt
         )
     {
-        _checkPaymentCheckFromReferenceExistence(
-            referenceId,
-            references[referenceId].checks.length - 1
-        );
+        _checkPaymentCheckFromReferenceExistence(referenceId, references[referenceId].checks.length - 1);
 
-        return getPaymentCheckById(
-            paymentChecks[
-                references[
-                    referenceId
-                ].checks[
-                    references[
-                        referenceId
-                    ].checks.length - 1
-                ]
-            ].id
-        );
+        return
+            getPaymentCheckById(
+                paymentChecks[references[referenceId].checks[references[referenceId].checks.length - 1]].id
+            );
     }
 
     // Get paymentCheckID if you want to iterate through all
     // the paymentChecks of a reference
-    function getPaymentCheckFromReference(
-        string memory referenceId,
-        uint index
-    )
+    function getPaymentCheckFromReference(string memory referenceId, uint256 index)
         public
         view
         returns (
             string memory id,
-            uint status,
-            uint checkedAt,
-            uint createdAt,
+            uint256 status,
+            uint256 checkedAt,
+            uint256 createdAt,
             bool more
         )
     {
         _checkReferenceExistence(referenceId);
 
-        require(
-            index < references[referenceId].checks.length,
-            "Overflowed index"
-        );
+        require(index < references[referenceId].checks.length, "Overflowed index");
 
         bool thereIsMore = false;
 
-        if (references[referenceId].checks.length > index + 1)
-            thereIsMore = true;
+        if (references[referenceId].checks.length > index + 1) thereIsMore = true;
 
         (
             string memory paymentCheckId,
-            uint paymentCheckStatus,
-            uint paymentCheckCheckedAt,
-            uint paymentCheckCreatedAt
-        ) = getPaymentCheckById(
-            references[referenceId].checks[index]
-        );
+            uint256 paymentCheckStatus,
+            uint256 paymentCheckCheckedAt,
+            uint256 paymentCheckCreatedAt
+        ) = getPaymentCheckById(references[referenceId].checks[index]);
 
-        return(
-            paymentCheckId,
-            paymentCheckStatus,
-            paymentCheckCheckedAt,
-            paymentCheckCreatedAt,
-            thereIsMore
-        );
+        return (paymentCheckId, paymentCheckStatus, paymentCheckCheckedAt, paymentCheckCreatedAt, thereIsMore);
     }
 
     // Get how many paymentChecks there are for a reference
-    function getPaymentCheckSizeFromReference(
-        string memory referenceId
-    )
-        public
-        view
-        returns (uint size)
-    {
+    function getPaymentCheckSizeFromReference(string memory referenceId) public view returns (uint256 size) {
         _checkReferenceExistence(referenceId);
 
         return references[referenceId].checks.length;
     }
 
     // Get reference if you got the id
-    function getReferenceById(
-        string memory referenceId
-    )
+    function getReferenceById(string memory referenceId)
         public
         view
         returns (
             string memory id,
             string memory value,
-            uint price
+            uint256 price
         )
     {
         _checkReferenceExistence(referenceId);
 
-        return(
-            references[referenceId].id,
-            references[referenceId].value,
-            references[referenceId].price
-        );
+        return (references[referenceId].id, references[referenceId].value, references[referenceId].price);
     }
 
     // Get referenceID if you want to iterate through all
     // the references of a receiver
-    function getReferenceFromReceiver(
-        string memory receiverId,
-        uint index
-    )
+    function getReferenceFromReceiver(string memory receiverId, uint256 index)
         public
         view
         returns (
             string memory id,
             string memory value,
-            uint price,
+            uint256 price,
             bool more
         )
     {
         _checkReceiverExistence(receiverId);
 
-        require(
-            index < receivers[receiverId].references.length,
-            "Overflowed index"
-        );
+        require(index < receivers[receiverId].references.length, "Overflowed index");
 
         bool thereIsMore = false;
 
-        if (receivers[receiverId].references.length > index + 1)
-            thereIsMore = true;
+        if (receivers[receiverId].references.length > index + 1) thereIsMore = true;
 
-        (
-            string memory referenceId,
-            string memory referenceValue,
-            uint referencePrice
-        ) = getReferenceById(
-            receivers[receiverId].references[index]
-        );
+        (string memory referenceId, string memory referenceValue, uint256 referencePrice) =
+            getReferenceById(receivers[receiverId].references[index]);
 
-        return(
-            referenceId,
-            referenceValue,
-            referencePrice,
-            thereIsMore
-        );
+        return (referenceId, referenceValue, referencePrice, thereIsMore);
     }
 
     // Get references size from receiver
-    function getReferenceSizeFromReceiver(
-        string memory receiverId
-    )
-        public
-        view
-        returns (uint size)
-    {
+    function getReferenceSizeFromReceiver(string memory receiverId) public view returns (uint256 size) {
         _checkReceiverExistence(receiverId);
 
         return receivers[receiverId].references.length;
     }
 
     // Get receiverID by index
-    function getReceiverId(
-        uint index
-    )
-        public
-        view
-        returns (
-            string memory id,
-            bool more
-        )
-    {
-        require(
-            index < receiversArray.length,
-            "Overflowed index"
-        );
+    function getReceiverId(uint256 index) public view returns (string memory id, bool more) {
+        require(index < receiversArray.length, "Overflowed index");
 
         bool thereIsMore = false;
 
-        if (receiversArray.length > index + 1)
-            thereIsMore = true;
+        if (receiversArray.length > index + 1) thereIsMore = true;
 
-        return(
-            receiversArray[index],
-            thereIsMore
-        );
+        return (receiversArray[index], thereIsMore);
     }
 
-    function _getReceiver(
-        string memory id
-    )
-        private
-        returns (Receiver storage)
-    {
+    function _getReceiver(string memory id) private returns (Receiver storage) {
         if (bytes(receivers[id].id).length == 0) {
-
             string[] memory tmpString;
 
             receivers[id] = Receiver(id, tmpString);
@@ -398,25 +274,13 @@ contract Payment is Clause(
         return receivers[id];
     }
 
-    function _getReference(
-        string memory receiverId,
-        string memory referenceId
-    )
-        private
-        returns (Reference storage)
-    {
+    function _getReference(string memory receiverId, string memory referenceId) private returns (Reference storage) {
         _getReceiver(receiverId);
 
         if (bytes(references[referenceId].id).length == 0) {
-
             string[] memory tmpPaymentChecks;
 
-            references[referenceId] = Reference(
-                referenceId,
-                "",
-                0,
-                tmpPaymentChecks
-            );
+            references[referenceId] = Reference(referenceId, "", 0, tmpPaymentChecks);
 
             receivers[receiverId].references.push(referenceId);
         }
@@ -424,54 +288,21 @@ contract Payment is Clause(
         return references[referenceId];
     }
 
-    function _checkReferenceExistence(
-        string memory id
-    )
-        private
-        view
-    {
-        require(
-            bytes(references[id].id).length != 0,
-            "This reference doesn't exist"
-        );
+    function _checkReferenceExistence(string memory id) private view {
+        require(bytes(references[id].id).length != 0, "This reference doesn't exist");
     }
 
-    function _checkReceiverExistence(
-        string memory id
-    )
-        private
-        view
-    {
-        require(
-            bytes(receivers[id].id).length != 0,
-            "This receiver doesn't exist"
-        );
+    function _checkReceiverExistence(string memory id) private view {
+        require(bytes(receivers[id].id).length != 0, "This receiver doesn't exist");
     }
 
-    function _checkPaymentCheckFromReferenceExistence(
-        string memory referenceId,
-        uint index
-    )
-        private
-        view
-    {
+    function _checkPaymentCheckFromReferenceExistence(string memory referenceId, uint256 index) private view {
         _checkReferenceExistence(referenceId);
 
-        require(
-            bytes(references[referenceId].checks[index]).length != 0,
-            "This payment check doesn't exist"
-        );
+        require(bytes(references[referenceId].checks[index]).length != 0, "This payment check doesn't exist");
     }
 
-    function _checkPaymentCheckExistence(
-        string memory id
-    )
-        private
-        view
-    {
-        require(
-            bytes(paymentChecks[id].id).length != 0,
-            "This payment check doesn't exist"
-        );
+    function _checkPaymentCheckExistence(string memory id) private view {
+        require(bytes(paymentChecks[id].id).length != 0, "This payment check doesn't exist");
     }
 }

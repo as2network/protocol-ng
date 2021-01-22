@@ -3,7 +3,6 @@ pragma solidity <0.6.0;
 import "./EventInterface.sol";
 import "./FileInterface.sol";
 
-
 contract CertificateInterface {
     address public certifiedEmail;
     address public owner;
@@ -13,44 +12,30 @@ contract CertificateInterface {
 
     string[] public eventsId;
 
-    uint public createdAt;
+    uint256 public createdAt;
 
     FileInterface public file;
 
     mapping(string => EventInterface) private events;
 
-    function init(
-        address certificateOwner,
-        uint certificateCreatedAt
-    )
-        public;
+    function init(address certificateOwner, uint256 certificateCreatedAt) public;
 
     function createFile(
         string memory fileHash,
         string memory fileId,
         string memory fileName,
-        uint fileCreatedAt,
-        uint fileSize
-    )
-        public;
+        uint256 fileCreatedAt,
+        uint256 fileSize
+    ) public;
 
     function createEvent(
         string memory eventId,
         string memory eventType,
         string memory eventUserAgent,
-        uint eventCreatedAt
-    )
-        public;
+        uint256 eventCreatedAt
+    ) public;
 
-    function getEvent(
-        string memory eventId
-    )
-        public
-        view
-        returns (address);
+    function getEvent(string memory eventId) public view returns (address);
 
-    function getEventsSize()
-        public
-        view
-        returns (uint);
+    function getEventsSize() public view returns (uint256);
 }

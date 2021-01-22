@@ -7,27 +7,23 @@ Gas to deploy: 747.382
 import "./interfaces/CertifiedFileInterface.sol";
 import "./interfaces/AS2networkUserInterface.sol";
 
-
 contract CertifiedFile is CertifiedFileInterface {
     address public as2network;
     address public owner;
 
-    string constant private CREATED_EVENT = "certified_file.contract.created";
-    string constant private NOTIFIERS_KEY = "certified-file-notifiers";
+    string private constant CREATED_EVENT = "certified_file.contract.created";
+    string private constant NOTIFIERS_KEY = "certified-file-notifiers";
 
     string public id;
     string public hash;
 
-    uint public createdAt;
-    uint public size;
+    uint256 public createdAt;
+    uint256 public size;
 
     AS2networkUserInterface public userContract;
 
     modifier as2networkOnly() {
-        require(
-            msg.sender == as2network,
-            "Only AS2network account can perform this action"
-        );
+        require(msg.sender == as2network, "Only AS2network account can perform this action");
 
         _;
     }
@@ -37,11 +33,9 @@ contract CertifiedFile is CertifiedFileInterface {
         address userContractAddress,
         string memory fileId,
         string memory fileHash,
-        uint fileCreatedAt,
-        uint fileSize
-    )
-        public
-    {
+        uint256 fileCreatedAt,
+        uint256 fileSize
+    ) public {
         as2network = msg.sender;
         owner = _owner;
 
@@ -53,25 +47,16 @@ contract CertifiedFile is CertifiedFileInterface {
         userContract = AS2networkUserInterface(userContractAddress);
     }
 
-    function notifyEvent ()
-        public
-        as2networkOnly
-    {
+    function notifyEvent() public as2networkOnly {
         address contractToNofify;
-        uint notificationIndex = 0;
+        uint256 notificationIndex = 0;
 
         do {
             contractToNofify = userContract.getAddressArrayAttribute(NOTIFIERS_KEY, notificationIndex);
             ++notificationIndex;
 
             if (contractToNofify != address(0)) {
-                contractToNofify.call(
-                    abi.encodeWithSignature(
-                        "notify(string,address)",
-                        CREATED_EVENT,
-                        address(this)
-                    )
-                );
+                contractToNofify.call(abi.encodeWithSignature("notify(string,address)", CREATED_EVENT, address(this)));
             }
         } while (contractToNofify != address(0));
     }
